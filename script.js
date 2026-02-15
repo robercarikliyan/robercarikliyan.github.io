@@ -95,6 +95,22 @@ function renderMessages() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
+// LINK VE FORMAT DUZELTICI
+function formatLinks(text) {
+  if (!text) return "";
+  
+  // Önce Markdown linklerini [Başlık](URL) -> <a> çevir
+  let formattedText = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, 
+    '<a href="$2" target="_blank" style="color: #007bff; text-decoration: underline; font-weight: bold;">$1</a>');
+
+  // Sonra açıkta kalan normal URL'leri çevir
+  const urlRegex = /(?<!href="|">)(https?:\/\/[^\s<]+)/g;
+  formattedText = formattedText.replace(urlRegex, 
+    '<a href="$1" target="_blank" style="color: #007bff; text-decoration: underline;">$1</a>');
+
+  // Satır atlamalarını (Enter) HTML'e çevir (\n -> <br>)
+  return formattedText.replace(/\n/g, '<br>');
+}
 // MESSAGE
 function addMessage(role, content) {
   const chat = getCurrentChat();
@@ -123,13 +139,16 @@ function addMessageToDOM(role, content) {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = content;
+  
+  // BURASI KRITIK: Metni formatlayıp HTML olarak basıyoruz
+  bubble.innerHTML = formatLinks(content);
 
   wrapper.appendChild(bubble);
   messagesEl.appendChild(wrapper);
+  
+  // Otomatik aşağı kaydır
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
-
 // SEND
 function sendMessage() {
   const text = promptEl.value.trim();
