@@ -138,20 +138,19 @@ function sendMessage() {
 
   addMessage("user", text);
   promptEl.value = "";
-
-  // ⬇⬇⬇ BURASI MAKE WEBHOOK YERİ ⬇⬇⬇
-  // fetch("MAKE_WEBHOOK_URL", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ input: text })
-  // })
-  // .then(res => res.json())
-  // .then(data => {
-  //   addMessage("assistant", data.output || "Yanıt alınamadı");
-  // })
-  // .catch(() => {
-  //   addMessage("assistant", "Bir hata oluştu.");
-  // });
+  
+   fetch("https://hook.eu1.make.com/r04fdt4l529fdupb11uppfcstdx5ynx6", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ input: text })
+   })
+   .then(res => res.json())
+   .then(data => {
+     addMessage("assistant", data.output || "Yanıt alınamadı");
+   })
+   .catch(() => {
+     addMessage("assistant", "Bir hata oluştu.");
+   });
 
   // geçici dummy cevap
   setTimeout(() => {
