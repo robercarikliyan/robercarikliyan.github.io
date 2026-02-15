@@ -1,65 +1,183 @@
-let chats = JSON.parse(localStorage.getItem("chats")) || [];
-let currentChat = null;
-
+// ELEMENTS
 const chatList = document.getElementById("chatList");
-const messages = document.getElementById("messages");
-const prompt = document.getElementById("prompt");
+const messagesEl = document.getElementById("messages");
+const promptEl = document.getElementById("prompt");
+const sendBtn = document.getElementById("sendBtn");
+const newChatBtn = document.getElementById("newChatBtn");
 
-function save() {
+// STATE
+let chats = JSON.parse(localStorage.getItem("chats")) || [];
+let currentChatId = localStorage.getItem("currentChatId") || null;
+
+// UTIL
+function saveState() {
   localStorage.setItem("chats", JSON.stringify(chats));
+  localStorage.setItem("currentChatId", currentChatId);
 }
 
+function generateId() {
+  return Date.now().toString();
+}
+
+// CHAT MANAGEMENT
+function createNewChat() {
+  const id = generateId();
+  const chat = {
+    id,
+    title: "Yeni Sohbet",
+    messages: [],
+    createdAt: Date.now()
+  };
+  chats.unshift(chat);
+  currentChatId = id;
+  saveState();
+  renderChats();
+  renderMessages();
+}
+
+function deleteChat(id) {
+  chats = chats.filter(c => c.id !== id);
+  if (currentChatId === id) {
+    currentChatId = chats.length ? chats[0].id : null;
+  }
+  saveState();
+  renderChats();
+  renderMessages();
+}
+
+function getCurrentChat() {
+  return chats.find(c => c.id === currentChatId) || null;
+}
+
+// RENDER
 function renderChats() {
   chatList.innerHTML = "";
-  chats.forEach((chat, i) => {
-    const div = document.createElement("div");
-    div.className = "chat-item";
-    div.textContent = chat.title;
-    div.onclick = () => openChat(i);
-    chatList.appendChild(div);
+
+  chats.forEach(chat => {
+    const item = document.createElement("div");
+    item.className = "chat-item" + (chat.id === currentChatId ? " active" : "");
+
+    const title = document.createElement("span");
+    title.className = "chat-title";
+    title.textContent = chat.title;
+
+    const del = document.createElement("button");
+    del.className = "chat-delete-btn";
+    del.textContent = "🗑";
+
+    del.onclick = (e) => {
+      e.stopPropagation();
+      deleteChat(chat.id);
+    };
+
+    item.onclick = () => {
+      currentChatId = chat.id;
+      saveState();
+      renderChats();
+      renderMessages();
+    };
+
+    item.appendChild(title);
+    item.appendChild(del);
+    chatList.appendChild(item);
   });
 }
 
-function openChat(i) {
-  currentChat = i;
-  messages.innerHTML = "";
-  chats[i].messages.forEach(m => addMessage(m.text, m.role));
+function renderMessages() {
+  messagesEl.innerHTML = "";
+  const chat = getCurrentChat();
+  if (!chat) return;
+
+  chat.messages.forEach(msg => {
+    addMessageToDOM(msg.role, msg.content);
+  });
+
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function addMessage(text, role) {
-  const div = document.createElement("div");
-  div.className = `message ${role}`;
-  div.textContent = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+// MESSAGE
+function addMessage(role, content) {
+  const chat = getCurrentChat();
+  if (!chat) return;
 
-document.getElementById("newChat").onclick = () => {
-  chats.unshift({ title: "New chat", messages: [] });
-  currentChat = 0;
-  save();
+  chat.messages.push({ role, content });
+
+  if (chat.messages.length === 1 && role === "user") {
+    chat.title = content.slice(0, 30);
+  }
+
+  saveState();
   renderChats();
-  messages.innerHTML = "";
-};
+  addMessageToDOM(role, content);
+}
 
-document.getElementById("send").onclick = () => {
-  if (!prompt.value.trim()) return;
+function addMessageToDOM(role, content) {
+  const wrapper = document.createElement("div");
+  wrapper.className = `message ${role}`;
 
-  const text = prompt.value;
-  prompt.value = "";
+  if (role === "assistant") {
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    wrapper.appendChild(avatar);
+  }
 
-  chats[currentChat].messages.push({ role: "user", text });
-  addMessage(text, "user");
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = content;
 
-  // fake bot reply (yerine Make.com koyarsın)
+  wrapper.appendChild(bubble);
+  messagesEl.appendChild(wrapper);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+// SEND
+function sendMessage() {
+  const text = promptEl.value.trim();
+  if (!text) return;
+  if (!getCurrentChat()) createNewChat();
+
+  addMessage("user", text);
+  promptEl.value = "";
+
+  // ⬇⬇⬇ BURASI MAKE WEBHOOK YERİ ⬇⬇⬇
+  // fetch("MAKE_WEBHOOK_URL", {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify({ input: text })
+  // })
+  // .then(res => res.json())
+  // .then(data => {
+  //   addMessage("assistant", data.output || "Yanıt alınamadı");
+  // })
+  // .catch(() => {
+  //   addMessage("assistant", "Bir hata oluştu.");
+  // });
+
+  // geçici dummy cevap
   setTimeout(() => {
-    const reply = "Bot cevabı burada.";
-    chats[currentChat].messages.push({ role: "bot", text: reply });
-    addMessage(reply, "bot");
-    save();
+    addMessage("assistant", "Yanıt burada görünecek.");
   }, 500);
+}
 
-  save();
-};
+// EVENTS
+sendBtn.onclick = sendMessage;
+
+promptEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+newChatBtn.onclick = createNewChat;
+
+// INIT
+if (!chats.length) {
+  createNewChat();
+} else if (!currentChatId || !getCurrentChat()) {
+  currentChatId = chats[0].id;
+  saveState();
+}
 
 renderChats();
+renderMessages();
