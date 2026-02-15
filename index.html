@@ -2,7 +2,10 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Deprem Kuşağı UI</title>
+  <title>Deprem Kuşağı AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,22 +14,78 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <button id="newChat">+ Yeni Sor</button>
-    <div id="chatList"></div>
+    <div class="sidebar-header">
+      <button id="newChatBtn" class="new-chat-btn">＋ Yeni Sohbet</button>
+    </div>
+
+    <div class="chat-history" id="chatList">
+      <!-- Chat item -->
+      <div class="chat-item active">
+        <span class="chat-title">Yeni Sohbet</span>
+        <button class="chat-delete-btn" title="Delete">🗑</button>
+      </div>
+
+      <!-- örnek -->
+      <div class="chat-item">
+        <span class="chat-title">Chat 2</span>
+        <button class="chat-delete-btn">🗑</button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar"></div>
+        <span class="username">User</span>
+      </div>
+    </div>
   </aside>
 
-  <!-- MAIN -->
-  <main class="chat">
-    <div id="messages"></div>
+  <!-- MAIN CHAT AREA -->
+  <main class="chat-container">
 
-    <div class="input-area">
-      <textarea id="prompt" placeholder="Mesajın..." rows="1"></textarea>
-      <button id="send">➤</button>
-    </div>
+    <!-- HEADER -->
+    <header class="chat-header">
+      <h1 class="chat-title-main">Chat</h1>
+    </header>
+
+    <!-- MESSAGES -->
+    <section class="messages" id="messages">
+      <!-- Assistant message -->
+      <div class="message assistant">
+        <div class="avatar"></div>
+        <div class="bubble">
+          Merhaba, nasıl yardımcı olabilirim?
+        </div>
+      </div>
+
+      <!-- User message -->
+      <div class="message user">
+        <div class="bubble">
+          Selam
+        </div>
+      </div>
+    </section>
+
+    <!-- INPUT AREA -->
+    <footer class="chat-input-area">
+      <div class="input-wrapper">
+        <textarea
+          id="prompt"
+          rows="1"
+          placeholder="Mesaj yaz..."
+        ></textarea>
+
+        <button id="sendBtn" class="send-btn">
+          ➤
+        </button>
+      </div>
+    </footer>
+
   </main>
 
 </div>
 
+<!-- JS -->
 <script src="script.js"></script>
 </body>
 </html>
