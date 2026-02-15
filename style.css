@@ -279,3 +279,12 @@ textarea::placeholder {
   visibility: visible;
   opacity: 1;
 }
+.chat-link {
+  color: #007bff;
+  text-decoration: underline;
+  word-break: break-all; /* Uzun linklerin balonu patlatmasını önler */
+}
+
+.chat-link:hover {
+  color: #0056b3;
+}
