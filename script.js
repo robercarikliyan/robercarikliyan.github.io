@@ -151,11 +151,6 @@ function sendMessage() {
    .catch(() => {
      addMessage("assistant", "Bir hata oluştu.");
    });
-
-  // geçici dummy cevap
-  setTimeout(() => {
-    addMessage("assistant", "Yanıt burada görünecek.");
-  }, 500);
 }
 
 // EVENTS
