@@ -144,22 +144,13 @@ function sendMessage() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ input: text })
   })
-  .then(async res => {
-    const raw = await res.text(); // Veriyi ham metin olarak alıyoruz
-    
-    // JSON parse ile uğraşmıyoruz, metni tırnakların arasından cımbızla çekiyoruz
-    // Bu regex, format ne kadar bozuk olursa olsun "output" değerini bulur
-    const match = raw.match(/"output":\s*"([\s\S]*)"/);
-    
-    if (match && match[1]) {
-      let finalContent = match[1].trim();
-      // Eğer metin tırnakla bitiyorsa o tırnağı temizleyelim (sondaki JSON tırnağı)
-      finalContent = finalContent.replace(/"\s*}$/, "");
-      
-      addMessage("assistant", finalContent);
+  .then(res => res.text()) // JSON DEĞİL, direkt metin olarak alıyoruz
+  .then(data => {
+    // Gelen veri direkt AI'ın cevabı olduğu için parse etmeden yazdırıyoruz
+    if (data) {
+      addMessage("assistant", data);
     } else {
-      console.error("Metin ayıklanamadı. Gelen veri:", raw);
-      addMessage("assistant", "Yanıt formatı ayıklanamadı, konsolu kontrol et.");
+      addMessage("assistant", "Yanıt boş geldi.");
     }
   })
   .catch(err => {
@@ -167,6 +158,7 @@ function sendMessage() {
     addMessage("assistant", "Bağlantı hatası oluştu.");
   });
 }
+
 // EVENTS
 sendBtn.onclick = sendMessage;
 
