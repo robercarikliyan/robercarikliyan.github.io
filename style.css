@@ -1,13 +1,12 @@
 * {
   box-sizing: border-box;
+  font-family: system-ui, sans-serif;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: #343541;
   color: #fff;
-  height: 100vh;
 }
 
 .app {
@@ -19,40 +18,33 @@ body {
 .sidebar {
   width: 260px;
   background: #202123;
+  padding: 10px;
   display: flex;
   flex-direction: column;
 }
 
-.sidebar-header {
-  padding: 12px;
-}
-
 .sidebar button {
-  width: 100%;
-  background: #343541;
-  color: #fff;
+  background: #444654;
   border: none;
+  color: #fff;
   padding: 10px;
+  margin-bottom: 10px;
   cursor: pointer;
-  border-radius: 6px;
 }
 
 #chatList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   overflow-y: auto;
   flex: 1;
 }
 
-#chatList li {
-  padding: 10px 12px;
+.chat-item {
+  padding: 8px;
   cursor: pointer;
-  border-bottom: 1px solid #2f303a;
+  border-radius: 6px;
 }
 
-#chatList li.active {
-  background: #444654;
+.chat-item:hover {
+  background: #2a2b32;
 }
 
 /* CHAT */
@@ -62,7 +54,7 @@ body {
   flex-direction: column;
 }
 
-.messages {
+#messages {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
@@ -70,47 +62,41 @@ body {
 
 .message {
   max-width: 70%;
-  margin-bottom: 16px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  line-height: 1.4;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
 }
 
-.message.user {
-  background: #4f46e5;
+.user {
+  background: #4a4b57;
   margin-left: auto;
 }
 
-.message.assistant {
+.bot {
   background: #444654;
-  margin-right: auto;
 }
 
 /* INPUT */
 .input-area {
   display: flex;
-  padding: 12px;
-  border-top: 1px solid #2f303a;
+  padding: 15px;
+  background: #40414f;
 }
 
 textarea {
   flex: 1;
   resize: none;
-  background: #40414f;
-  border: none;
-  color: #fff;
   padding: 10px;
   border-radius: 6px;
-  outline: none;
-  font-size: 14px;
+  border: none;
 }
 
-button#sendBtn {
-  margin-left: 8px;
-  background: #4f46e5;
+button#send {
+  margin-left: 10px;
+  padding: 10px 15px;
   border: none;
-  color: #fff;
-  padding: 0 16px;
-  border-radius: 6px;
+  background: #19c37d;
+  color: black;
   cursor: pointer;
+  border-radius: 6px;
 }
