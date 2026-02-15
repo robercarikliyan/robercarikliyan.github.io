@@ -145,18 +145,21 @@ function sendMessage() {
     body: JSON.stringify({ input: text })
   })
   .then(async res => {
-    const raw = await res.text(); // Veriyi ham metin olarak al
+    const raw = await res.text(); // Veriyi ham metin olarak alıyoruz
     
-    try {
-      // JSON'U BOZAN ENTER (ALT SATIR) KARAKTERLERİNİ TEMİZLİYORUZ:
-      // Bu satır, metnin içindeki gerçek 'Enter'ları '\n' yazısına çevirir ve JSON'u tamir eder.
-      const fixedData = raw.replace(/[\n\r]/g, "\\n"); 
-      const data = JSON.parse(fixedData);
+    // JSON parse ile uğraşmıyoruz, metni tırnakların arasından cımbızla çekiyoruz
+    // Bu regex, format ne kadar bozuk olursa olsun "output" değerini bulur
+    const match = raw.match(/"output":\s*"([\s\S]*)"/);
+    
+    if (match && match[1]) {
+      let finalContent = match[1].trim();
+      // Eğer metin tırnakla bitiyorsa o tırnağı temizleyelim (sondaki JSON tırnağı)
+      finalContent = finalContent.replace(/"\s*}$/, "");
       
-      addMessage("assistant", data.output || "Cevap gelmedi.");
-    } catch (e) {
-      console.error("Hala hata var. Ham veri:", raw);
-      addMessage("assistant", "Veri işlenirken bir sorun oluştu.");
+      addMessage("assistant", finalContent);
+    } else {
+      console.error("Metin ayıklanamadı. Gelen veri:", raw);
+      addMessage("assistant", "Yanıt formatı ayıklanamadı, konsolu kontrol et.");
     }
   })
   .catch(err => {
@@ -164,7 +167,6 @@ function sendMessage() {
     addMessage("assistant", "Bağlantı hatası oluştu.");
   });
 }
-
 // EVENTS
 sendBtn.onclick = sendMessage;
 
