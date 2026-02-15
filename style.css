@@ -222,3 +222,61 @@ textarea::placeholder {
 .send-btn:hover {
   background-color: #2a2b32;
 }
+/* İkonun etrafındaki kapsayıcı */
+.info-container {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  margin-left: 10px;
+}
+
+/* Bilgi İkonu */
+.info-icon {
+  font-size: 18px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.info-container:hover .info-icon {
+  opacity: 1;
+}
+
+/* Gizli Baloncuk */
+.info-bubble {
+  visibility: hidden;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 8px;
+  padding: 10px;
+  position: absolute;
+  z-index: 100;
+  bottom: 125%; /* İkonun üstünde çıkması için */
+  left: 50%;
+  margin-left: -110px; /* Genişliğin yarısı kadar sola kaydırıp ortalıyoruz */
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  pointer-events: none; /* Mouse baloncuğun üstüne gelince titremeyi önler */
+}
+
+/* Baloncuğun altındaki küçük ok ucu */
+.info-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Üstüne gelince göster */
+.info-container:hover .info-bubble {
+  visibility: visible;
+  opacity: 1;
+}
