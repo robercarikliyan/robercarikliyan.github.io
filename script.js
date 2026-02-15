@@ -139,18 +139,26 @@ function sendMessage() {
   addMessage("user", text);
   promptEl.value = "";
   
-   fetch("https://hook.eu1.make.com/r04fdt4l529fdupb11uppfcstdx5ynx6", {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ input: text })
-   })
-   .then(res => res.json())
-   .then(data => {
-     addMessage("assistant", data.output || "Yanıt alınamadı");
-   })
-   .catch(() => {
-     addMessage("assistant", "Bir hata oluştu.");
-   });
+  fetch("https://hook.eu1.make.com/r04fdt4l529fdupb11uppfcstdx5ynx6", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ input: text })
+  })
+  .then(async res => {
+    // Yanıtın JSON olup olmadığını kontrol ederek alıyoruz
+    const rawText = await res.text();
+    try {
+      const data = JSON.parse(rawText);
+      addMessage("assistant", data.output || "Cevap anahtarı (output) bulunamadı.");
+    } catch (e) {
+      console.error("JSON Parse Hatası! Gelen ham veri:", rawText);
+      addMessage("assistant", "Sunucudan bozuk veri geldi. Konsolu (F12) kontrol et.");
+    }
+  })
+  .catch((err) => {
+    console.error("Fetch Hatası:", err);
+    addMessage("assistant", "Bağlantı hatası oluştu.");
+  });
 }
 
 // EVENTS
