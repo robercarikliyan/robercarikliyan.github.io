@@ -145,18 +145,22 @@ function sendMessage() {
     body: JSON.stringify({ input: text })
   })
   .then(async res => {
-    // Yanıtın JSON olup olmadığını kontrol ederek alıyoruz
-    const rawText = await res.text();
+    const raw = await res.text(); // Veriyi ham metin olarak al
+    
     try {
-      const data = JSON.parse(rawText);
-      addMessage("assistant", data.output || "Cevap anahtarı (output) bulunamadı.");
+      // JSON'U BOZAN ENTER (ALT SATIR) KARAKTERLERİNİ TEMİZLİYORUZ:
+      // Bu satır, metnin içindeki gerçek 'Enter'ları '\n' yazısına çevirir ve JSON'u tamir eder.
+      const fixedData = raw.replace(/[\n\r]/g, "\\n"); 
+      const data = JSON.parse(fixedData);
+      
+      addMessage("assistant", data.output || "Cevap gelmedi.");
     } catch (e) {
-      console.error("JSON Parse Hatası! Gelen ham veri:", rawText);
-      addMessage("assistant", "Sunucudan bozuk veri geldi. Konsolu (F12) kontrol et.");
+      console.error("Hala hata var. Ham veri:", raw);
+      addMessage("assistant", "Veri işlenirken bir sorun oluştu.");
     }
   })
-  .catch((err) => {
-    console.error("Fetch Hatası:", err);
+  .catch(err => {
+    console.error("Bağlantı hatası:", err);
     addMessage("assistant", "Bağlantı hatası oluştu.");
   });
 }
