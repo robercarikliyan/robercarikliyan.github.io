@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <meta charset="utf-8">
-  <title>Çalışıyor mu?</title>
+  <meta charset="UTF-8" />
+  <title>Deprem Kuşağı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>GitHub Pages çalışıyor 🚀</h1>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <button id="newChat">+ Yeni sor</button>
+    </div>
+    <ul id="chatList"></ul>
+  </aside>
+
+  <!-- CHAT AREA -->
+  <main class="chat">
+    <div id="messages" class="messages"></div>
+
+    <div class="input-area">
+      <textarea id="userInput" placeholder="Mesaj yaz..." rows="1"></textarea>
+      <button id="sendBtn">➤</button>
+    </div>
+  </main>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
