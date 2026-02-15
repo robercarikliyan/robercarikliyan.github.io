@@ -1,104 +1,65 @@
 let chats = JSON.parse(localStorage.getItem("chats")) || [];
-let activeChatId = localStorage.getItem("activeChatId") || null;
+let currentChat = null;
 
 const chatList = document.getElementById("chatList");
-const messagesEl = document.getElementById("messages");
-const input = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
-const newChatBtn = document.getElementById("newChat");
+const messages = document.getElementById("messages");
+const prompt = document.getElementById("prompt");
 
 function save() {
   localStorage.setItem("chats", JSON.stringify(chats));
-  localStorage.setItem("activeChatId", activeChatId);
 }
 
 function renderChats() {
   chatList.innerHTML = "";
-  chats.forEach(chat => {
-    const li = document.createElement("li");
-    li.textContent = chat.title;
-    if (chat.id === activeChatId) li.classList.add("active");
-    li.onclick = () => {
-      activeChatId = chat.id;
-      save();
-      render();
-    };
-    chatList.appendChild(li);
-  });
-}
-
-function renderMessages() {
-  messagesEl.innerHTML = "";
-  const chat = chats.find(c => c.id === activeChatId);
-  if (!chat) return;
-
-  chat.messages.forEach(msg => {
+  chats.forEach((chat, i) => {
     const div = document.createElement("div");
-    div.className = `message ${msg.role}`;
-    div.textContent = msg.content;
-    messagesEl.appendChild(div);
+    div.className = "chat-item";
+    div.textContent = chat.title;
+    div.onclick = () => openChat(i);
+    chatList.appendChild(div);
   });
-
-  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function render() {
+function openChat(i) {
+  currentChat = i;
+  messages.innerHTML = "";
+  chats[i].messages.forEach(m => addMessage(m.text, m.role));
+}
+
+function addMessage(text, role) {
+  const div = document.createElement("div");
+  div.className = `message ${role}`;
+  div.textContent = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+document.getElementById("newChat").onclick = () => {
+  chats.unshift({ title: "New chat", messages: [] });
+  currentChat = 0;
+  save();
   renderChats();
-  renderMessages();
-}
+  messages.innerHTML = "";
+};
 
-function newChat() {
-  const chat = {
-    id: Date.now().toString(),
-    title: "New chat",
-    messages: []
-  };
-  chats.unshift(chat);
-  activeChatId = chat.id;
-  save();
-  render();
-}
+document.getElementById("send").onclick = () => {
+  if (!prompt.value.trim()) return;
 
-function sendMessage() {
-  const text = input.value.trim();
-  if (!text || !activeChatId) return;
+  const text = prompt.value;
+  prompt.value = "";
 
-  const chat = chats.find(c => c.id === activeChatId);
+  chats[currentChat].messages.push({ role: "user", text });
+  addMessage(text, "user");
 
-  chat.messages.push({ role: "user", content: text });
-
-  if (chat.messages.length === 1) {
-    chat.title = text.slice(0, 20);
-  }
-
-  input.value = "";
-  save();
-  render();
-
-  // FAKE ASSISTANT RESPONSE (yerine API / webhook bağlanacak)
+  // fake bot reply (yerine Make.com koyarsın)
   setTimeout(() => {
-    chat.messages.push({
-      role: "assistant",
-      content: "Bu bir placeholder cevap. Buraya AI bağlanacak."
-    });
+    const reply = "Bot cevabı burada.";
+    chats[currentChat].messages.push({ role: "bot", text: reply });
+    addMessage(reply, "bot");
     save();
-    render();
-  }, 600);
-}
+  }, 500);
 
-sendBtn.onclick = sendMessage;
+  save();
+};
 
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-newChatBtn.onclick = newChat;
-
-if (!chats.length) {
-  newChat();
-} else {
-  render();
-}
+renderChats();
